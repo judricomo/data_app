@@ -1,1 +1,2 @@
-fastparquet
+fastparquet==2023.4.0
+pandas==2.0.2
