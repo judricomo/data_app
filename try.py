@@ -45,5 +45,7 @@ with st.form(key="add form", clear_on_submit= True):
             if st.session_state.df.shape[0] == num_new_rows:
                 st.error("Add row limit reached...")
 
-st.session_state
-st.dataframe(st.session_state.df)
+    st.session_state
+    st.dataframe(st.session_state.df)
+
+    df = st.session_state.df

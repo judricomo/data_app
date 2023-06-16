@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import datetime
-import io
 
 st.title('Sell Out Forms')
 
@@ -113,37 +112,22 @@ with tab1:
             df = st.session_state.df
             rw = st.session_state.df.shape[0] + 1
             st.info(f"Row: {rw} / {num_new_rows} added")
-            st.session_state.df.loc[rw] = rwdta
-            st.session_state.df =df.append({"CustomerSoldTo": st.session_state.CustomerSoldTo,
-                                             "GroupName": st.session_state.GroupName,
-                                             "BannerName": st.session_state.BannerName,
-                                             "BusinessModel": st.session_state.BusinessModel,
-                                             "CustomerChannel": st.session_state.CustomerChannel,
-                                             "CustomerSegmentation": st.session_state.CustomerSegmentation,
-                                             "WHSChannel": st.session_state.WHSChannel}, ignore_index=True)
+            #st.session_state.df.loc[rw] = rwdta
+            new_row = {
+                "CustomerSoldTo": st.session_state.CustomerSoldTo,
+                "GroupName": st.session_state.GroupName,
+                "BannerName": st.session_state.BannerName,
+                "BusinessModel": st.session_state.BusinessModel,
+                "CustomerChannel": st.session_state.CustomerChannel,
+                "CustomerSegmentation": st.session_state.CustomerSegmentation,
+                "WHSChannel": st.session_state.WHSChannel,
+            }
+            st.session_state.df = pd.concat([df, pd.DataFrame(new_row, index=[rw])], ignore_index=True)
             if st.session_state.df.shape[0] == num_new_rows:
                 st.error("Add a row, limit reached...")
 
     st.dataframe(st.session_state.df)
-# st.session_state
-    df = st.session_state.df
-    parquet_file = df.to_parquet('df.parquet', engine='fastparquet')
-    with open('df.parquet', 'rb') as file:
-        # Read the file as bytes using 'rb' mode
-        file_data = file.read()
-
-    # Use io.BytesIO to create a file-like object from the bytes data
-    file_obj = io.BytesIO(file_data)
-
-    # Display the download button
-    btn = st.download_button(
-        label="Download Parquet File",
-        data=file_obj,
-        file_name="df.parquet",
-        mime='application/octet-stream',  # Set the appropriate MIME type for the file
-        use_container_width= True
-    )
-    # st.download_button("Download Parquet File",data=parquet_file, use_container_width=True)
+#st.session_state
 with tab2:
     st.header("Store")
     st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
