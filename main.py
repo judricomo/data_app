@@ -127,7 +127,20 @@ with tab1:
                 st.error("Add a row, limit reached...")
 
     st.dataframe(st.session_state.df)
-#st.session_state
+
+    @st.cache_data
+    def convert_df(df):
+        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+        return df.to_csv().encode('utf-8')
+
+    csv = convert_df(st.session_state.df)
+
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name='dataframe_df.csv',
+        mime='text/csv',
+    )
 with tab2:
     st.header("Store")
     st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
