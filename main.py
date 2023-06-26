@@ -176,20 +176,20 @@ with tab2:
                                                         "State",
                                                         "City"])
         num_new_rows_store = st.sidebar.number_input("Add Rows To Table Store", 1, 500)
-        ncol_store = st.session_state.dfStore.shape[1]  # col count
+        ncol_campaign = st.session_state.dfStore.shape[1]  # col count
         rw_store = -1
-        rwdta_store = []
+        rwdta_campaign = []
         if "num_new_rows_store" not in st.session_state:
             st.session_state.num_new_rows_store = num_new_rows_store
-        if "ncol_store" not in st.session_state:
-            st.session_state.ncol_store = ncol_store
-        if "rw_store" not in st.session_state and "rwdta_store" not in st.session_state:
+        if "ncol_campaign" not in st.session_state:
+            st.session_state.ncol_campaign = ncol_campaign
+        if "rw_store" not in st.session_state and "rwdta_campaign" not in st.session_state:
             st.session_state.rw_store = rw_store
-            st.session_state.rwdta_store = rwdta_store
+            st.session_state.rwdta_campaign = rwdta_campaign
 
     col1, col2, col3 = st.columns(3)
     with col2:
-        Attach_button = st.button("Attach File Store", use_container_width=True)
+        Attach_button_store = st.button("Attach File Store", use_container_width=True)
     cont3 = st.container()
 
     with cont3:
@@ -200,7 +200,7 @@ with tab2:
             Delete_button_store = st.button("Delete Store", use_container_width=True)
         with col4:
             save_button_store = st.button("Save Store", use_container_width=True)
-    rwdta_store = [value for value in st.session_state.dfStore.columns]
+    rwdta_campaign = [value for value in st.session_state.dfStore.columns]
     if st.button("Add Store", use_container_width=True):
         if st.session_state.dfStore.shape[0] == num_new_rows_store:
             st.error("Add row limit reached. Cant add any more records..")
@@ -241,7 +241,84 @@ with tab2:
 with tab3:
     st.header("Campaign")
 #    st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+    cont1 = st.container()
 
+    with cont1:
+
+        st.subheader("Input Information")
+        CampaignName = st.text_input(
+            "CampaignName", "input value", key="CampaignName")
+        CampaingnStartDate = st.text_input(
+            "CampaingnStartDate", "input value", key="CampaingnStartDate")
+        CampaignEndName = st.text_input(
+            "CampaignEndName", "input value", key="CampaignEndName")
+        ArticleCode = st.text_input(
+            "ArticleCode", "input value", key="ArticleCode")
+        if "dfCampaign" not in st.session_state:
+            st.session_state.dfCampaign = pd.DataFrame(columns=["CampaignName",
+                                                        "CampaignStartDate",
+                                                        "CampaingEndDate",
+                                                        "ArticleCode",])
+        num_new_rows_campaign = st.sidebar.number_input("Add Rows To Table Campaign", 1, 500)
+        ncol_campaign = st.session_state.dfCampaign.shape[1]  # col count
+        rw_campaign = -1
+        rwdta_campaign = []
+        if "num_new_rows_campaign" not in st.session_state:
+            st.session_state.num_new_rows_campaign = num_new_rows_campaign
+        if "ncol_campaign" not in st.session_state:
+            st.session_state.ncol_campaign = ncol_campaign
+        if "rw_campaign" not in st.session_state and "rwdta_campaign" not in st.session_state:
+            st.session_state.rw_campaign = rw_campaign
+            st.session_state.rwdta_campaign = rwdta_campaign
+
+    col1, col2, col3 = st.columns(3)
+    with col2:
+        Attach_button_campaign = st.button("Attach File Campaign", use_container_width=True)
+    cont3 = st.container()
+
+    with cont3:
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col2:
+            edit_button_campaign = st.button("Edit Campaign", use_container_width=True)
+        with col3:
+            Delete_button_campaign = st.button("Delete Campaign", use_container_width=True)
+        with col4:
+            save_button_campaign = st.button("Save Campaign", use_container_width=True)
+    rwdta_campaign = [value for value in st.session_state.dfCampaign.columns]
+    if st.button("Add campaign", use_container_width=True):
+        if st.session_state.dfCampaign.shape[0] == num_new_rows_campaign:
+            st.error("Add row limit reached. Cant add any more records..")
+        else:
+            dfCampaign = st.session_state.dfCampaign
+            rw = st.session_state.dfCampaign.shape[0] + 1
+            st.info(f"Row: {rw_campaign} / {num_new_rows_campaign} added")
+            #st.session_state.df.loc[rw] = rwdta
+            num_new_rows_campaign = {
+                "CampaignName": st.session_state.CampaignName,
+                "CampaignStartDate": st.session_state.CampaignStartDate,
+                "CampaignEndDate": st.session_state.CampaignEndDate,
+                "ArticleCode": st.session_state.ArticleCode,
+            }
+            st.session_state.dfCampaign = pd.concat([dfCampaign,
+                                                  pd.DataFrame(num_new_rows_campaign, index=[rw_campaign])],
+                                                  ignore_index=True)
+            if st.session_state.dfCampaign.shape[0] == num_new_rows_campaign:
+                st.error("Add a row, limit reached...")
+
+    st.dataframe(st.session_state.dfCampaign)
+
+    @st.cache_data
+    def convert_df_campaign(df):
+        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+        return df.to_csv().encode('utf-8')
+    csv_campaign = convert_df_campaign(st.session_state.dfCampaign)
+
+    st.download_button(
+        label="Download data as CSV",
+        data=csv_campaign,
+        file_name='dataframe_campaign.csv',
+        mime='text/csv',
+    )
 
 with tab4:
     st.header("Target")
