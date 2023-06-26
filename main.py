@@ -1,7 +1,6 @@
+import datetime
 import streamlit as st
 import pandas as pd
-import numpy as np
-import datetime
 
 st.title('Sell Out Forms')
 
@@ -28,7 +27,8 @@ with tab1:
                                                                "Generalist",
                                                                "Directional",
                                                                "Platform",
-                                                               "Distributors/B2B"), key="CustomerChannel")
+                                                               "Distributors/B2B"),
+                                                               key="CustomerChannel")
             CustomerSegmentation = st.selectbox("CustomerSegmentation", ("BDAS",
                                                                          "BDFS",
                                                                          "BDMS",
@@ -94,7 +94,7 @@ with tab1:
     col1, col2, col3 = st.columns(3)
     with col2:
         Attach_button = st.button("Attach File", use_container_width=True)
-    cont3 = st.container()
+        cont3 = st.container()
 
     with cont3:
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -122,7 +122,9 @@ with tab1:
                 "CustomerSegmentation": st.session_state.CustomerSegmentation,
                 "WHSChannel": st.session_state.WHSChannel,
             }
-            st.session_state.df = pd.concat([df, pd.DataFrame(new_row, index=[rw])], ignore_index=True)
+            st.session_state.df = pd.concat([df,
+                                             pd.DataFrame(new_row, index=[rw])],
+                                             ignore_index=True)
             if st.session_state.df.shape[0] == num_new_rows:
                 st.error("Add a row, limit reached...")
 
@@ -143,11 +145,103 @@ with tab1:
     )
 with tab2:
     st.header("Store")
-    st.image("https://static.streamlit.io/examples/dog.jpg", width=200)
+    cont1 = st.container()
 
+    with cont1:
+
+        st.subheader("Input Information")
+        CustomerSoldToStore = st.text_input(
+            "CustomerSoldTo", "input value", key="CustomerSoldToStore")
+        OriginalStoreCode = st.text_input(
+            "OriginalStoreCode", "input value", key="OriginalStoreCode")
+        StoreName = st.text_input(
+            "StoreName", "input value", key="StoreName")
+        Channel = st.selectbox("Channel", ("Digital",
+                                            "Brick and Mortar",
+                                            "Catalogs"),
+                                            key="Channel")
+        KTZ = st.selectbox("KTZ", ("Yes",
+                                    "No",),
+                                    key="KTZ")
+        State = st.text_input(
+            "State", "input value", key="State")
+        City = st.text_input(
+            "City", "input value", key="City")
+        if "dfStore" not in st.session_state:
+            st.session_state.dfStore = pd.DataFrame(columns=["CustomerSoldTo",
+                                                        "OriginalStoreCode",
+                                                        "StoreName",
+                                                        "Channel",
+                                                        "KTZ",
+                                                        "State",
+                                                        "City"])
+        num_new_rows_store = st.sidebar.number_input("Add Rows To Table Store", 1, 500)
+        ncol_store = st.session_state.dfStore.shape[1]  # col count
+        rw_store = -1
+        rwdta_store = []
+        if "num_new_rows_store" not in st.session_state:
+            st.session_state.num_new_rows_store = num_new_rows_store
+        if "ncol_store" not in st.session_state:
+            st.session_state.ncol_store = ncol_store
+        if "rw_store" not in st.session_state and "rwdta_store" not in st.session_state:
+            st.session_state.rw_store = rw_store
+            st.session_state.rwdta_store = rwdta_store
+
+    col1, col2, col3 = st.columns(3)
+    with col2:
+        Attach_button = st.button("Attach File Store", use_container_width=True)
+    cont3 = st.container()
+
+    with cont3:
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col2:
+            edit_button_store = st.button("Edit Store", use_container_width=True)
+        with col3:
+            Delete_button_store = st.button("Delete Store", use_container_width=True)
+        with col4:
+            save_button_store = st.button("Save Store", use_container_width=True)
+    rwdta_store = [value for value in st.session_state.dfStore.columns]
+    if st.button("Add Store", use_container_width=True):
+        if st.session_state.dfStore.shape[0] == num_new_rows_store:
+            st.error("Add row limit reached. Cant add any more records..")
+        else:
+            dfStore = st.session_state.dfStore
+            rw = st.session_state.dfStore.shape[0] + 1
+            st.info(f"Row: {rw_store} / {num_new_rows_store} added")
+            #st.session_state.df.loc[rw] = rwdta
+            num_new_rows_store = {
+                "CustomerSoldTo": st.session_state.CustomerSoldTo,
+                "OriginalStoreCode": st.session_state.OriginalStoreCode,
+                "StoreName": st.session_state.StoreName,
+                "Channel": st.session_state.Channel,
+                "KTZ": st.session_state.KTZ,
+                "State": st.session_state.State,
+                "City": st.session_state.City,
+            }
+            st.session_state.dfStore = pd.concat([dfStore,
+                                                  pd.DataFrame(num_new_rows_store, index=[rw_store])],
+                                                  ignore_index=True)
+            if st.session_state.dfStore.shape[0] == num_new_rows_store:
+                st.error("Add a row, limit reached...")
+
+    st.dataframe(st.session_state.dfStore)
+
+    @st.cache_data
+    def convert_df_store(df):
+        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+        return df.to_csv().encode('utf-8')
+    csv_store = convert_df_store(st.session_state.dfStore)
+
+    st.download_button(
+        label="Download data as CSV",
+        data=csv_store,
+        file_name='dataframe_store.csv',
+        mime='text/csv',
+    )
 with tab3:
     st.header("Campaign")
-    st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+#    st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+
 
 with tab4:
     st.header("Target")
